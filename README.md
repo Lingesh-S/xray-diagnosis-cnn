@@ -56,9 +56,9 @@ Run the web app locally to upload your own X-ray images and get instant diagnosi
 streamlit run streamlit_app.py
 ```
 
-#📄 License
+## 📄 License
 This project is open source and available under the MIT License.
 
-#🙋‍♂️ Author
+## 🙋‍♂️ Author
 Lingesh S
 
