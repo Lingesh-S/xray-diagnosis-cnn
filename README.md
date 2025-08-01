@@ -44,7 +44,6 @@ This project uses Convolutional Neural Networks (CNNs) to classify chest X-ray i
 
 Grad-CAM is used to highlight regions in the image that influenced the model's prediction.
 
-![gradcam-sample](./assets/gradcam-example.png)
 
 ---
 
