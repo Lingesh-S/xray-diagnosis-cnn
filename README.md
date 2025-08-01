@@ -7,3 +7,10 @@ This project uses Convolutional Neural Networks (CNNs) to classify chest X-ray i
 - Built using custom CNN and/or transfer learning (e.g., ResNet, MobileNet)
 - Model explainability with Grad-CAM
 - Optional Streamlit app for real-time prediction from uploaded X-rays
+
+#📄 License
+This project is open source and available under the MIT License.
+
+#🙋‍♂️ Author
+Lingesh S
+
