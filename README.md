@@ -58,6 +58,7 @@ streamlit run streamlit_app.py
 ## 📄 License
 This project is open source and available under the MIT License.
 
-## 🙋‍♂️ Author
-Lingesh S
+# 👨‍💻 Author
+**Lingesh S**
 
+[GitHub](https://github.com/Lingesh-S) • [LinkedIn](https://linkedin.com/in/lingesh-s29)
