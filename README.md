@@ -13,7 +13,7 @@ This project uses Convolutional Neural Networks (CNNs) to classify chest X-ray i
 
 ---
 
-## 🏗️ Tech Stack
+##  Tech Stack
 
 - Python
 - OpenCV
