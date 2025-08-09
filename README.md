@@ -13,6 +13,14 @@ This project uses Convolutional Neural Networks (CNNs) to classify chest X-ray i
 
 ---
 
+## 🧑‍⚕️ Use Cases
+
+- Radiology assistance tool for lung disease detection
+- Medical imaging classification demo using CNN
+- Portfolio project for AI/ML and Deep Learning
+
+---
+
 ##  Tech Stack
 
 - Python
