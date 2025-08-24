@@ -10,7 +10,6 @@ This project uses Convolutional Neural Networks (CNNs) to classify chest X-ray i
 -  Grad-CAM visualization for model explainability (optional)
 -  Optional Streamlit app for real-time X-ray predictions
 
-
 ---
 
 ## 🧑‍⚕️ Use Cases
