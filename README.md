@@ -49,13 +49,6 @@ This project uses Convolutional Neural Networks (CNNs) to classify chest X-ray i
 
 ---
 
-## 🔍 Grad-CAM Visualizations *(Optional)*
-
-Grad-CAM is used to highlight regions in the image that influenced the model's prediction.
-
-
----
-
 ## 🌐 Streamlit Web App *(Optional)*
 
 Run the web app locally to upload your own X-ray images and get instant diagnosis:
