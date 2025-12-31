@@ -48,6 +48,10 @@ This project uses Convolutional Neural Networks (CNNs) to classify chest X-ray i
 | Chest X-ray 2 | Normal |
 
 ---
+### 🎯
+- 🚀 Master Gen AI & LLM-based apps  
+- 📊 Build & share more AI dashboards  
+- 🤝 Collaborate with the open-source AI community  
 
 ## 🌐 Streamlit Web App *(Optional)*
 
