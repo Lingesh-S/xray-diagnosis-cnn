@@ -28,7 +28,7 @@ through a simple Streamlit web app.
 |---|------|----------------|
 | G1 | Reproducible data pipeline for the Kaggle *Chest X-Ray Images (Pneumonia)* dataset | One command downloads/organises data; train/val/test splits are deterministic |
 | G2 | Baseline custom CNN | Test accuracy ≥ 85% |
-| G3 | Transfer-learning model (MobileNetV2 / ResNet50) | Test accuracy ≥ 90%, pneumonia recall ≥ 95% |
+| G3 | Transfer-learning model (MobileNetV2 / EfficientNetB0) | Test accuracy ≥ 90%, pneumonia recall ≥ 95% |
 | G4 | Proper evaluation | Accuracy, precision, recall, F1, ROC-AUC, confusion matrix saved to `reports/` |
 | G5 | Explainability | Grad-CAM heatmap overlay for any input image |
 | G6 | Interactive demo | `streamlit run streamlit_app.py` → upload image → prediction + confidence + heatmap |
@@ -94,7 +94,7 @@ Pace: at most 3–4 commits per working day; a progress report every 2 days in
 
 | Phase | Branch | Scope | Status |
 |-------|--------|-------|--------|
-| 1 — Foundation | `feature/project-foundation` | Goals doc, project layout, config, data pipeline, CNN models, training script, tests | 🚧 In progress |
+| 1 — Foundation | `feature/project-foundation` | Goals doc, project layout, config, data pipeline, CNN models, training script, tests | 🚧 On branch, awaiting PR |
 | 2 — Evaluation & Explainability | `feature/evaluation-gradcam` | `evaluate.py`, metrics/plots, `gradcam.py`, `predict.py` CLI, tests | ⏳ Planned |
 | 3 — Web App & CI | `feature/streamlit-app` | `streamlit_app.py`, GitHub Actions CI (lint + tests) | ⏳ Planned |
 | 4 — Polish | `feature/docs-results` | README rewrite, results table, screenshots, model card | ⏳ Planned |
