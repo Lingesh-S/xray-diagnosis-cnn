@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# Data, models and outputs
+data/
+models/
+reports/
+logs/
+*.keras
+*.h5
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

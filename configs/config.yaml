@@ -1,0 +1,20 @@
+seed: 42
+
+data:
+  root: data/chest_xray
+  classes: [NORMAL, PNEUMONIA]
+  image_size: [224, 224]
+  batch_size: 32
+  val_fraction: 0.1   # carved out of train/ because the official val split is tiny
+
+model:
+  name: mobilenetv2   # one of: custom_cnn, mobilenetv2, resnet50
+  dropout: 0.3
+  fine_tune_layers: 0 # unfreeze the last N backbone layers (transfer models only)
+
+train:
+  epochs: 20
+  learning_rate: 0.001
+  early_stopping_patience: 5
+  use_class_weights: true
+  output_dir: models
