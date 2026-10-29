@@ -1,11 +1,10 @@
 import numpy as np
 import pytest
 
+from conftest import CLASSES
 from lungai.gradcam import compute_gradcam, find_target_layer, overlay_heatmap
 from lungai.model import MODEL_NAMES, build_model
 from lungai.predict import predict_image, save_gradcam
-
-from conftest import CLASSES
 
 
 @pytest.mark.parametrize("name", MODEL_NAMES)
