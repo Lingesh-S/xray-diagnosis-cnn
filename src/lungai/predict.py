@@ -18,6 +18,16 @@ from lungai.data import load_image
 from lungai.gradcam import compute_gradcam, overlay_heatmap
 
 
+def interpret(prob: float, classes: list[str], threshold: float = 0.5) -> dict:
+    """Turn P(PNEUMONIA) into a label, its confidence and the raw probability."""
+    is_positive = prob >= threshold
+    return {
+        "label": classes[1] if is_positive else classes[0],
+        "confidence": prob if is_positive else 1.0 - prob,
+        "pneumonia_probability": prob,
+    }
+
+
 def predict_image(
     model: tf.keras.Model,
     image_path: str | Path,
@@ -25,15 +35,10 @@ def predict_image(
     image_size: tuple[int, int],
     threshold: float = 0.5,
 ) -> dict:
-    """Classify one image; returns label, confidence and P(PNEUMONIA)."""
+    """Classify one image file; returns label, confidence and P(PNEUMONIA)."""
     image = load_image(tf.constant(str(image_path)), tuple(image_size)).numpy()
     prob = float(model.predict(image[None, ...], verbose=0)[0, 0])
-    is_positive = prob >= threshold
-    return {
-        "label": classes[1] if is_positive else classes[0],
-        "confidence": prob if is_positive else 1.0 - prob,
-        "pneumonia_probability": prob,
-    }
+    return interpret(prob, classes, threshold)
 
 
 def save_gradcam(

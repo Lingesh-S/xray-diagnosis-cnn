@@ -61,9 +61,7 @@ def make_splits(
     pooled_paths = train.paths + val.paths
     pooled_labels = train.labels + val.labels
     if not pooled_paths:
-        raise FileNotFoundError(
-            f"No training images found under {root}. Run scripts/download_data.py first."
-        )
+        raise FileNotFoundError(f"No training images found under {root}. Run scripts/download_data.py first.")
 
     tr_p, va_p, tr_y, va_y = train_test_split(
         pooled_paths,
@@ -79,15 +77,19 @@ def class_weights(labels: list[int]) -> dict[int, float]:
     """Balanced class weights to counter the ~3:1 pneumonia/normal imbalance."""
     classes = np.unique(labels)
     weights = compute_class_weight("balanced", classes=classes, y=np.asarray(labels))
-    return {int(c): float(w) for c, w in zip(classes, weights)}
+    return {int(c): float(w) for c, w in zip(classes, weights, strict=True)}
+
+
+def decode_image(raw: tf.Tensor | bytes, image_size: tuple[int, int]) -> tf.Tensor:
+    """Decode encoded JPEG/PNG bytes into a float32 RGB tensor in [0, 255]."""
+    img = tf.io.decode_image(raw, channels=3, expand_animations=False)
+    img = tf.image.resize(img, image_size)
+    return tf.cast(img, tf.float32)
 
 
 def load_image(path: tf.Tensor, image_size: tuple[int, int]) -> tf.Tensor:
     """Read an image file as a float32 RGB tensor in [0, 255]."""
-    raw = tf.io.read_file(path)
-    img = tf.io.decode_image(raw, channels=3, expand_animations=False)
-    img = tf.image.resize(img, image_size)
-    return tf.cast(img, tf.float32)
+    return decode_image(tf.io.read_file(path), image_size)
 
 
 def augmentation() -> tf.keras.Sequential:
@@ -115,9 +117,7 @@ def make_dataset(
     Images stay in [0, 255]; each model applies its own preprocessing.
     """
     image_size = tuple(image_size)
-    ds = tf.data.Dataset.from_tensor_slices(
-        (split.paths, np.asarray(split.labels, dtype=np.float32))
-    )
+    ds = tf.data.Dataset.from_tensor_slices((split.paths, np.asarray(split.labels, dtype=np.float32)))
     if training:
         ds = ds.shuffle(len(split), seed=seed, reshuffle_each_iteration=True)
     ds = ds.map(lambda p, y: (load_image(p, image_size), y), num_parallel_calls=AUTOTUNE)
