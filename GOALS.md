@@ -94,15 +94,15 @@ Pace: at most 3–4 commits per working day; a progress report every 2 days in
 
 | Phase | Branch | Scope | Status |
 |-------|--------|-------|--------|
-| 1 — Foundation | `feature/project-foundation` | Goals doc, project layout, config, data pipeline, CNN models, training script, tests | 🚧 On branch, awaiting PR |
-| 2 — Evaluation & Explainability | `feature/evaluation-gradcam` | `evaluate.py`, metrics/plots, `gradcam.py`, `predict.py` CLI, tests | ⏳ Planned |
+| 1 — Foundation | `feature/project-foundation` | Goals doc, project layout, config, data pipeline, CNN models, training script, tests | ✅ Merged (PR #1) |
+| 2 — Evaluation & Explainability | `feature/evaluation-gradcam` | `evaluate.py`, metrics/plots, `gradcam.py`, `predict.py` CLI, tests | 🚧 On branch, awaiting PR |
 | 3 — Web App & CI | `feature/streamlit-app` | `streamlit_app.py`, GitHub Actions CI (lint + tests) | ⏳ Planned |
 | 4 — Polish | `feature/docs-results` | README rewrite, results table, screenshots, model card | ⏳ Planned |
 
 ### Definition of done (whole project)
 - [ ] `python scripts/download_data.py` prepares the dataset
 - [ ] `python -m lungai.train --model mobilenetv2` trains and saves a model
-- [ ] `python -m lungai.evaluate` writes metrics + confusion matrix to `reports/`
-- [ ] `python -m lungai.predict path/to/xray.jpeg` prints label + confidence
+- [x] `python -m lungai.evaluate` writes metrics + confusion matrix to `reports/`
+- [x] `python -m lungai.predict path/to/xray.jpeg` prints label + confidence
 - [ ] `streamlit run streamlit_app.py` serves the demo with Grad-CAM
 - [ ] CI is green on every PR
