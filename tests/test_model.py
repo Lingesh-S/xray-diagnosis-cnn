@@ -15,16 +15,16 @@ def test_build_model_output(name):
 
 def test_transfer_backbone_frozen_by_default():
     model = build_model("mobilenetv2", image_size=(96, 96), weights=None)
-    backbone = next(l for l in model.layers if l.name.startswith("mobilenetv2"))
+    backbone = next(layer for layer in model.layers if layer.name.startswith("mobilenetv2"))
     assert not backbone.trainable
 
 
 def test_fine_tune_unfreezes_last_layers():
     model = build_model("mobilenetv2", image_size=(96, 96), weights=None, fine_tune_layers=10)
-    backbone = next(l for l in model.layers if l.name.startswith("mobilenetv2"))
-    trainable = [l for l in backbone.layers if l.trainable and l.weights]
+    backbone = next(layer for layer in model.layers if layer.name.startswith("mobilenetv2"))
+    trainable = [layer for layer in backbone.layers if layer.trainable and layer.weights]
     assert trainable
-    assert all(l in backbone.layers[-10:] for l in trainable)
+    assert all(layer in backbone.layers[-10:] for layer in trainable)
 
 
 def test_unknown_model():

@@ -1,8 +1,7 @@
 import pytest
 
-from lungai.data import class_weights, list_images, make_dataset, make_splits
-
 from conftest import CLASSES
+from lungai.data import class_weights, list_images, make_dataset, make_splits
 
 
 def test_list_images_labels(fake_dataset):

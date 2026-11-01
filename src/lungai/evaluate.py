@@ -107,7 +107,9 @@ def evaluate(
     reports_dir.mkdir(parents=True, exist_ok=True)
     with open(reports_dir / "metrics.json", "w", encoding="utf-8") as f:
         json.dump(metrics, f, indent=2)
-    plot_confusion_matrix(metrics["confusion_matrix"], data_cfg["classes"], reports_dir / "confusion_matrix.png")
+    plot_confusion_matrix(
+        metrics["confusion_matrix"], data_cfg["classes"], reports_dir / "confusion_matrix.png"
+    )
     if metrics["roc_auc"] is not None:
         plot_roc_curve(y_true, y_prob, metrics["roc_auc"], reports_dir / "roc_curve.png")
     return metrics
