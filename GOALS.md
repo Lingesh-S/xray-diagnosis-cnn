@@ -24,16 +24,16 @@ through a simple Streamlit web app.
 
 ## 2. Goals
 
-| # | Goal | Success metric |
-|---|------|----------------|
-| G1 | Reproducible data pipeline for the Kaggle *Chest X-Ray Images (Pneumonia)* dataset | One command downloads/organises data; train/val/test splits are deterministic |
-| G2 | Baseline custom CNN | Test accuracy ≥ 85% |
-| G3 | Transfer-learning model (MobileNetV2 / EfficientNetB0) | Test accuracy ≥ 90%, pneumonia recall ≥ 95% |
-| G4 | Proper evaluation | Accuracy, precision, recall, F1, ROC-AUC, confusion matrix saved to `reports/` |
-| G5 | Explainability | Grad-CAM heatmap overlay for any input image |
-| G6 | Interactive demo | `streamlit run streamlit_app.py` → upload image → prediction + confidence + heatmap |
-| G7 | Engineering quality | Modular `src/` package, config file, unit tests, GitHub Actions CI |
-| G8 | Documentation | README with setup, training, results and screenshots |
+| # | Goal | Success metric | Status |
+|---|------|----------------|--------|
+| G1 | Reproducible data pipeline for the Kaggle *Chest X-Ray Images (Pneumonia)* dataset | One command downloads/organises data; train/val/test splits are deterministic | ✅ |
+| G2 | Baseline custom CNN | Test accuracy ≥ 85% | ⏳ Not trained on real data yet |
+| G3 | Transfer-learning model (MobileNetV2 / EfficientNetB0) | Test accuracy ≥ 90%, pneumonia recall ≥ 95% | 🟡 89.1% accuracy (target 90%), 98.7% recall |
+| G4 | Proper evaluation | Accuracy, precision, recall, F1, ROC-AUC, confusion matrix saved to `reports/` | ✅ |
+| G5 | Explainability | Grad-CAM heatmap overlay for any input image | ✅ |
+| G6 | Interactive demo | `streamlit run streamlit_app.py` → upload image → prediction + confidence + heatmap | ✅ |
+| G7 | Engineering quality | Modular `src/` package, config file, unit tests, GitHub Actions CI | ✅ |
+| G8 | Documentation | README with setup, training, results and screenshots | ✅ |
 
 ### Non-goals
 - Multi-disease classification beyond Normal/Pneumonia (possible future work).
@@ -96,13 +96,13 @@ Pace: at most 3–4 commits per working day; a progress report every 2 days in
 |-------|--------|-------|--------|
 | 1 — Foundation | `feature/project-foundation` | Goals doc, project layout, config, data pipeline, CNN models, training script, tests | ✅ Merged (PR #1) |
 | 2 — Evaluation & Explainability | `feature/evaluation-gradcam` | `evaluate.py`, metrics/plots, `gradcam.py`, `predict.py` CLI, tests | ✅ Merged (PR #2) |
-| 3 — Web App & CI | `feature/streamlit-app` | `streamlit_app.py`, GitHub Actions CI (lint + tests) | 🚧 On branch, awaiting PR |
-| 4 — Polish | `feature/docs-results` | README rewrite, results table, screenshots, model card | ⏳ Planned |
+| 3 — Web App & CI | `feature/streamlit-app` | `streamlit_app.py`, GitHub Actions CI (lint + tests) | ✅ Merged (PR #3) |
+| 4 — Polish | `feature/docs-results` | Real training + fine-tuning, threshold tuning, README rewrite, results, screenshots, model card | 🚧 On branch, awaiting PR |
 
 ### Definition of done (whole project)
-- [ ] `python scripts/download_data.py` prepares the dataset
-- [ ] `python -m lungai.train --model mobilenetv2` trains and saves a model
+- [x] `python scripts/download_data.py` prepares the dataset
+- [x] `python -m lungai.train --model mobilenetv2` trains and saves a model
 - [x] `python -m lungai.evaluate` writes metrics + confusion matrix to `reports/`
 - [x] `python -m lungai.predict path/to/xray.jpeg` prints label + confidence
 - [x] `streamlit run streamlit_app.py` serves the demo with Grad-CAM
-- [ ] CI is green on every PR
+- [x] CI is green on every PR
