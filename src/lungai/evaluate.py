@@ -32,7 +32,8 @@ from sklearn.metrics import (  # noqa: E402
 )
 
 from lungai.config import load_config  # noqa: E402
-from lungai.data import list_images, make_dataset  # noqa: E402
+from lungai.data import Split, list_images, make_dataset, make_splits  # noqa: E402
+from lungai.thresholds import save_threshold  # noqa: E402
 
 
 def compute_metrics(y_true: np.ndarray, y_prob: np.ndarray, threshold: float = 0.5) -> dict:
@@ -88,6 +89,27 @@ def plot_roc_curve(y_true: np.ndarray, y_prob: np.ndarray, auc: float | None, pa
     plt.close(fig)
 
 
+def select_threshold(y_true: np.ndarray, y_prob: np.ndarray) -> float:
+    """Threshold that maximises Youden's J (sensitivity + specificity - 1)."""
+    fpr, tpr, thresholds = roc_curve(y_true, y_prob)
+    best = int(np.argmax(tpr - fpr))
+    return float(np.clip(thresholds[best], 0.0, 1.0))
+
+
+def predict_split(model: tf.keras.Model, split: Split, config: dict) -> tuple[np.ndarray, np.ndarray]:
+    data_cfg = config["data"]
+    ds = make_dataset(split, tuple(data_cfg["image_size"]), data_cfg["batch_size"])
+    return np.asarray(split.labels), model.predict(ds, verbose=0).ravel()
+
+
+def tune_threshold(model: tf.keras.Model, config: dict) -> float:
+    """Pick the decision threshold on the validation split (never on the test set)."""
+    data_cfg = config["data"]
+    splits = make_splits(data_cfg["root"], data_cfg["classes"], data_cfg["val_fraction"], config["seed"])
+    y_true, y_prob = predict_split(model, splits["val"], config)
+    return select_threshold(y_true, y_prob)
+
+
 def evaluate(
     model: tf.keras.Model, config: dict, reports_dir: str | Path = "reports", threshold: float = 0.5
 ) -> dict:
@@ -97,10 +119,7 @@ def evaluate(
     if not len(test):
         raise FileNotFoundError(f"No test images found under {data_cfg['root']}/test")
 
-    ds = make_dataset(test, tuple(data_cfg["image_size"]), data_cfg["batch_size"])
-    y_prob = model.predict(ds, verbose=0).ravel()
-    y_true = np.asarray(test.labels)
-
+    y_true, y_prob = predict_split(model, test, config)
     metrics = compute_metrics(y_true, y_prob, threshold)
 
     reports_dir = Path(reports_dir)
@@ -121,12 +140,26 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--model-path", help="Defaults to <train.output_dir>/<model.name>.keras.")
     parser.add_argument("--reports-dir", default="reports")
     parser.add_argument("--threshold", type=float, default=0.5)
+    parser.add_argument(
+        "--tune-threshold",
+        action="store_true",
+        help="Choose the threshold on the validation split and save it next to the model.",
+    )
     args = parser.parse_args(argv)
 
     config = load_config(args.config)
-    model_path = args.model_path or Path(config["train"]["output_dir"]) / f"{config['model']['name']}.keras"
+    model_path = Path(
+        args.model_path or Path(config["train"]["output_dir"]) / f"{config['model']['name']}.keras"
+    )
     model = tf.keras.models.load_model(model_path)
-    metrics = evaluate(model, config, args.reports_dir, args.threshold)
+
+    threshold = args.threshold
+    if args.tune_threshold:
+        threshold = tune_threshold(model, config)
+        save_threshold(model_path, threshold)
+        print(f"   threshold: {threshold:.4f} (chosen on validation split)")
+
+    metrics = evaluate(model, config, args.reports_dir, threshold)
 
     for key in ("accuracy", "precision", "recall", "specificity", "f1", "roc_auc"):
         value = metrics[key]

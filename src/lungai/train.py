@@ -33,8 +33,18 @@ def compile_model(model: tf.keras.Model, learning_rate: float) -> tf.keras.Model
     return model
 
 
-def train(config: dict, weights: str | None = "imagenet") -> tuple[tf.keras.Model, dict]:
-    """Train a model as described by ``config``; returns the model and its history."""
+def train(
+    config: dict,
+    weights: str | None = "imagenet",
+    init_from: str | Path | None = None,
+    run_name: str | None = None,
+) -> tuple[tf.keras.Model, dict]:
+    """Train a model as described by ``config``; returns the model and its history.
+
+    ``init_from`` starts from a saved model's weights, which is how the second,
+    fine-tuning stage continues from the frozen-backbone run. Outputs are named
+    after ``run_name`` (defaults to the model name).
+    """
     seed = config["seed"]
     tf.keras.utils.set_random_seed(seed)
 
@@ -53,11 +63,14 @@ def train(config: dict, weights: str | None = "imagenet") -> tuple[tf.keras.Mode
         fine_tune_layers=model_cfg["fine_tune_layers"],
         weights=weights,
     )
+    if init_from:
+        model.load_weights(init_from)
     compile_model(model, train_cfg["learning_rate"])
 
+    run_name = run_name or model_cfg["name"]
     out_dir = Path(train_cfg["output_dir"])
     out_dir.mkdir(parents=True, exist_ok=True)
-    model_path = out_dir / f"{model_cfg['name']}.keras"
+    model_path = out_dir / f"{run_name}.keras"
 
     callbacks = [
         tf.keras.callbacks.ModelCheckpoint(model_path, monitor="val_loss", save_best_only=True),
@@ -67,7 +80,7 @@ def train(config: dict, weights: str | None = "imagenet") -> tuple[tf.keras.Mode
             restore_best_weights=True,
         ),
         tf.keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=2),
-        tf.keras.callbacks.CSVLogger(out_dir / f"{model_cfg['name']}_history.csv"),
+        tf.keras.callbacks.CSVLogger(out_dir / f"{run_name}_history.csv"),
     ]
 
     cw = class_weights(splits["train"].labels) if train_cfg["use_class_weights"] else None
@@ -79,7 +92,7 @@ def train(config: dict, weights: str | None = "imagenet") -> tuple[tf.keras.Mode
         callbacks=callbacks,
     )
 
-    with open(out_dir / f"{model_cfg['name']}_config.json", "w", encoding="utf-8") as f:
+    with open(out_dir / f"{run_name}_config.json", "w", encoding="utf-8") as f:
         json.dump(config, f, indent=2)
     print(f"Best model saved to {model_path}")
     return model, history.history
@@ -91,6 +104,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--model", choices=MODEL_NAMES, help="Override model.name.")
     parser.add_argument("--epochs", type=int, help="Override train.epochs.")
     parser.add_argument("--data-root", help="Override data.root.")
+    parser.add_argument("--learning-rate", type=float, help="Override train.learning_rate.")
+    parser.add_argument(
+        "--fine-tune-layers", type=int, help="Override model.fine_tune_layers (unfreeze last N layers)."
+    )
+    parser.add_argument("--init-from", help="Start from this saved model's weights (fine-tuning).")
+    parser.add_argument("--run-name", help="Output file name stem; defaults to the model name.")
     return parser.parse_args(argv)
 
 
@@ -103,7 +122,11 @@ def main(argv: list[str] | None = None) -> None:
         config["train"]["epochs"] = args.epochs
     if args.data_root:
         config["data"]["root"] = args.data_root
-    train(config)
+    if args.learning_rate:
+        config["train"]["learning_rate"] = args.learning_rate
+    if args.fine_tune_layers is not None:
+        config["model"]["fine_tune_layers"] = args.fine_tune_layers
+    train(config, init_from=args.init_from, run_name=args.run_name)
 
 
 if __name__ == "__main__":
