@@ -16,6 +16,7 @@ import tensorflow as tf
 from lungai.config import load_config
 from lungai.data import load_image
 from lungai.gradcam import compute_gradcam, overlay_heatmap
+from lungai.thresholds import load_threshold
 
 
 def interpret(prob: float, classes: list[str], threshold: float = 0.5) -> dict:
@@ -55,7 +56,7 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("image", help="Path to a chest X-ray image.")
     parser.add_argument("--config", default=None, help="Path to YAML config.")
     parser.add_argument("--model-path", help="Defaults to <train.output_dir>/<model.name>.keras.")
-    parser.add_argument("--threshold", type=float, default=0.5)
+    parser.add_argument("--threshold", type=float, help="Defaults to the tuned threshold, else 0.5.")
     parser.add_argument("--gradcam", help="Optional output path for a Grad-CAM overlay PNG.")
     args = parser.parse_args(argv)
 
@@ -64,7 +65,8 @@ def main(argv: list[str] | None = None) -> None:
     model = tf.keras.models.load_model(model_path)
     image_size = tuple(config["data"]["image_size"])
 
-    result = predict_image(model, args.image, config["data"]["classes"], image_size, args.threshold)
+    threshold = args.threshold if args.threshold is not None else load_threshold(model_path)
+    result = predict_image(model, args.image, config["data"]["classes"], image_size, threshold)
     print(f"{result['label']} ({result['confidence']:.1%} confidence)")
 
     if args.gradcam:

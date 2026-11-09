@@ -6,6 +6,7 @@ from streamlit.testing.v1 import AppTest
 from conftest import CLASSES
 from lungai.model import build_model
 from lungai.predict import interpret
+from lungai.thresholds import save_threshold
 
 APP = str(Path(__file__).resolve().parents[1] / "streamlit_app.py")
 
@@ -37,3 +38,13 @@ def test_app_with_model(tmp_path, monkeypatch):
     assert not at.warning
     assert at.selectbox[0].value.name == "custom_cnn.keras"
     assert at.slider[0].value == 0.5
+
+
+def test_app_uses_tuned_threshold(tmp_path, monkeypatch):
+    model_path = tmp_path / "custom_cnn.keras"
+    build_model("custom_cnn", image_size=(64, 64)).save(model_path)
+    save_threshold(model_path, 0.72)
+    monkeypatch.setenv("LUNGAI_MODELS_DIR", str(tmp_path))
+    at = AppTest.from_file(APP, default_timeout=60).run()
+    assert not at.exception
+    assert at.slider[0].value == pytest.approx(0.72)
