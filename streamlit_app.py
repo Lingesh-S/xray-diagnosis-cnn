@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "src"))
 
 from lungai.config import load_config  # noqa: E402
+from lungai.thresholds import load_threshold  # noqa: E402
 
 CONFIG = load_config()
 CLASSES = CONFIG["data"]["classes"]
@@ -58,7 +59,8 @@ st.info(
     icon=":material/info:",
 )
 
-model_paths = sorted(MODELS_DIR.glob("*.keras"))
+# Newest model first, so a freshly trained or fine-tuned model is the default.
+model_paths = sorted(MODELS_DIR.glob("*.keras"), key=lambda p: p.stat().st_mtime, reverse=True)
 if not model_paths:
     st.warning(
         f"Train one first with `python -m lungai.train`; models are loaded from `{MODELS_DIR}`.",
@@ -74,9 +76,11 @@ with st.sidebar:
         "Pneumonia threshold",
         min_value=0.05,
         max_value=0.95,
-        value=0.5,
-        step=0.05,
-        help="Images with a pneumonia probability at or above this value are labelled pneumonia.",
+        value=round(load_threshold(model_path), 2),
+        step=0.01,
+        key=f"threshold_{model_path.stem}",
+        help="Images with a pneumonia probability at or above this value are labelled pneumonia. "
+        "Defaults to the threshold tuned on the validation set, if one was saved.",
     )
     show_heatmap = st.toggle("Show Grad-CAM heatmap", value=True)
     opacity = st.slider("Heatmap opacity", 0.1, 0.9, 0.4, 0.05, disabled=not show_heatmap)
