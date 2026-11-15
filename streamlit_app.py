@@ -62,11 +62,22 @@ st.info(
 # Newest model first, so a freshly trained or fine-tuned model is the default.
 model_paths = sorted(MODELS_DIR.glob("*.keras"), key=lambda p: p.stat().st_mtime, reverse=True)
 if not model_paths:
+    from lungai.pretrained import RELEASE_TAG, download_pretrained
+
     st.warning(
-        f"Train one first with `python -m lungai.train`; models are loaded from `{MODELS_DIR}`.",
+        f"Download the pretrained model ({RELEASE_TAG}, about 10 MB) or train your own with "
+        f"`python -m lungai.train`. Models are loaded from `{MODELS_DIR}`.",
         title="No trained model found",
         icon=":material/model_training:",
     )
+    if st.button("Download pretrained model", icon=":material/download:", type="primary"):
+        try:
+            with st.spinner("Downloading model..."):
+                download_pretrained(MODELS_DIR)
+        except Exception as exc:  # network error or checksum mismatch
+            st.error(f"Download failed: {exc}", icon=":material/error:")
+        else:
+            st.rerun()
     st.stop()
 
 with st.sidebar:
