@@ -4,8 +4,10 @@ import pytest
 from streamlit.testing.v1 import AppTest
 
 from conftest import CLASSES
+from lungai import pretrained
 from lungai.model import build_model
 from lungai.predict import interpret
+from lungai.pretrained import sha256
 from lungai.thresholds import save_threshold
 
 APP = str(Path(__file__).resolve().parents[1] / "streamlit_app.py")
@@ -27,7 +29,27 @@ def test_app_without_model(tmp_path, monkeypatch):
     at = AppTest.from_file(APP, default_timeout=60).run()
     assert not at.exception
     assert at.warning[0].proto.title == "No trained model found"
+    assert at.button[0].label == "Download pretrained model"
     assert not at.selectbox
+
+
+def test_app_downloads_pretrained_model(tmp_path, monkeypatch):
+    release = tmp_path / "release"
+    release.mkdir()
+    build_model("custom_cnn", image_size=(64, 64)).save(release / "mobilenetv2_ft.keras")
+    save_threshold(release / "mobilenetv2_ft.keras", 0.81)
+    monkeypatch.setattr(pretrained, "RELEASE_FILES", {p.name: sha256(p) for p in release.iterdir()})
+    monkeypatch.setenv("LUNGAI_RELEASE_URL", release.as_uri())
+    models = tmp_path / "models"
+    monkeypatch.setenv("LUNGAI_MODELS_DIR", str(models))
+
+    at = AppTest.from_file(APP, default_timeout=60).run()
+    at.button[0].click().run()
+
+    assert not at.exception
+    assert not at.error
+    assert at.selectbox[0].value.name == "mobilenetv2_ft.keras"
+    assert at.slider[0].value == pytest.approx(0.81)
 
 
 def test_app_with_model(tmp_path, monkeypatch):

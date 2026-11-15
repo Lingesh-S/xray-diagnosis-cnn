@@ -49,7 +49,8 @@ See the [model card](docs/model_card.md) for data, intended use and limitations.
   curve, with validation-based threshold tuning.
 - **Explainability**: Grad-CAM heatmaps for every supported model.
 - **Web app**: upload an X-ray, see the prediction, confidence and heatmap, adjust the threshold.
-- **Quality**: 30 pytest tests, ruff lint and format checks, GitHub Actions CI on every pull request.
+- **Pretrained model**: published as a GitHub release, downloadable with one command or from the app.
+- **Quality**: 34 pytest tests, ruff lint and format checks, GitHub Actions CI on every pull request.
 
 ## Quick start
 
@@ -61,6 +62,20 @@ python -m venv .venv
 pip install -r requirements.txt
 pip install -e .
 ```
+
+### Use the pretrained model (no training needed)
+
+```bash
+python scripts/download_model.py
+streamlit run streamlit_app.py
+```
+
+This downloads the fine-tuned MobileNetV2 (about 10 MB) and its tuned threshold from the
+[v1.0.0 release](https://github.com/Lingesh-S/xray-diagnosis-cnn/releases/tag/v1.0.0) into
+`models/`, checking each file's SHA-256 hash. The app also offers a **Download pretrained model**
+button when `models/` is empty.
+
+To reproduce the model yourself, follow the steps below.
 
 ### 1. Get the data
 
@@ -124,9 +139,11 @@ xray-diagnosis-cnn/
 │   ├── train.py               # training and fine-tuning entry point
 │   ├── evaluate.py            # metrics, plots, threshold tuning
 │   ├── thresholds.py          # save/load tuned thresholds
+│   ├── pretrained.py          # download the released model
 │   ├── gradcam.py             # Grad-CAM heatmaps
 │   └── predict.py             # single-image inference CLI
 ├── scripts/download_data.py   # Kaggle download helper
+├── scripts/download_model.py  # pretrained model download
 ├── streamlit_app.py           # web demo
 ├── tests/                     # pytest suite (synthetic data, no download needed)
 ├── docs/                      # model card, progress notes, images

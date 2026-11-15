@@ -1,7 +1,10 @@
 # Model Card — LungAI MobileNetV2 Pneumonia Classifier
 
 ## Model details
-- **Model file:** `models/mobilenetv2_ft.keras` (not committed; reproduce with the README commands).
+- **Model file:** `mobilenetv2_ft.keras` and `mobilenetv2_ft_threshold.json`, published in the
+  [v1.0.0 release](https://github.com/Lingesh-S/xray-diagnosis-cnn/releases/tag/v1.0.0)
+  (`python scripts/download_model.py`). Saved for inference only, without optimizer state;
+  requires TensorFlow 2.16+ (Keras 3).
 - **Architecture:** MobileNetV2 backbone pre-trained on ImageNet with a new head:
   global average pooling → dropout (0.3) → single sigmoid unit giving P(PNEUMONIA).
 - **Input:** RGB chest X-ray resized to 224 × 224, raw pixel values in [0, 255]
